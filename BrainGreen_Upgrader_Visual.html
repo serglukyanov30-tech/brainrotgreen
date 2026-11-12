@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BrainrotGreen — демо</title>
+<style>
+:root{--bg:#10121d;--panel:#1b1f30;--panel2:#252b40;--text:#f4f5ff;--muted:#aab1ca;--accent:#18a77c;--green:#5de0a1;--red:#ff6e86}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font:15px system-ui,Arial;overflow-x:hidden;
+background:
+radial-gradient(ellipse at 50% -12%,#1d806b55 0,transparent 42%),
+radial-gradient(ellipse at 8% 55%,#087a6540 0,transparent 34%),
+radial-gradient(ellipse at 92% 70%,#0b536044 0,transparent 38%),
+linear-gradient(180deg,#071311 0%,#050a0b 48%,#07100f 100%);
+background-attachment:fixed}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.23;
+background-image:linear-gradient(90deg,#5b9d8212 1px,transparent 1px),linear-gradient(#5b9d8212 1px,transparent 1px),radial-gradient(#80d9b7 1px,transparent 1px);
+background-size:48px 48px,48px 48px,137px 137px;background-position:center center,center center,20px 12px}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+background:linear-gradient(115deg,transparent 20%,#38d6a008 48%,transparent 72%)}
+header{background:#07100ff2;backdrop-filter:blur(12px);box-shadow:0 8px 35px #0008;border-bottom:1px solid #4cc9a322}
+.panel{background:linear-gradient(155deg,#101d1bf5,#080e0ff5);backdrop-filter:blur(12px);box-shadow:0 18px 55px #0009;border:1px solid #3ca98a35}
+.case,.item{background:linear-gradient(155deg,#142b27,#0b1515 72%);border:1px solid #327d6a55;transition:transform .2s,box-shadow .2s}
+.case:hover,.item:hover{border-color:#68d9b1;box-shadow:0 0 24px #1dbb8a33,0 12px 28px #0008}
+.case:hover,.item:hover{transform:translateY(-4px);box-shadow:0 12px 28px #0005}
+button{box-shadow:0 5px 16px #9b7bff33;transition:filter .15s,transform .15s}
+button:active{transform:scale(.97)}
+header{padding:22px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;border-bottom:1px solid #ffffff18}
+h1{margin:0;font-size:clamp(23px,4vw,34px)}h1 span{color:var(--accent)}
+button,input{font:inherit;border:0;border-radius:11px;padding:11px 14px}button{background:var(--accent);color:white;font-weight:700;cursor:pointer}button:hover{filter:brightness(1.12)}button:disabled{opacity:.45;cursor:not-allowed}
+input{background:#111522;color:white;border:1px solid #ffffff20;min-width:0}
+.balance{background:var(--panel);padding:11px 16px;border-radius:13px;border:1px solid #ffffff18}
+main{max-width:1150px;margin:25px auto;padding:0 18px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.tabs button{background:var(--panel2)}.tabs button.active{background:var(--accent)}
+.panel{background:#1b1f30eF;border:1px solid #ffffff18;border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 12px 35px #0003}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.case,.item{background:var(--panel2);border:1px solid #ffffff15;border-radius:15px;padding:16px;text-align:center}
+.emoji{font-size:42px;margin:8px}.muted{color:var(--muted)}.price{color:#ffd34d;font-weight:900;margin:9px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.row input{flex:1;min-width:130px}
+.hidden{display:none!important}.result{font-size:19px;font-weight:800;margin-top:13px;min-height:28px}
+.wheel{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:18px 0}.slot{background:linear-gradient(145deg,#18352e,#101a19);border:1px solid #4a9d7b55;border-radius:12px;padding:18px 4px;text-align:center;font-weight:900;font-size:20px}.slot.active{outline:3px solid var(--accent);background:#473b76}
+.notice{color:var(--muted);font-size:13px;line-height:1.5}.admin-section{border-top:1px solid #ffffff20;padding-top:15px;margin-top:15px}
+label{display:block;color:var(--muted);font-size:13px;margin:8px 0 5px}.small{font-size:12px;color:var(--muted)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#303852;padding:12px 18px;border-radius:12px;display:none;z-index:10}
+.upgrader-layout{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:14px;align-items:center}
+.upgrade-box{min-height:190px;background:linear-gradient(145deg,#182522,#0b1113);border:1px solid #3b8c70;border-radius:12px;padding:18px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px}
+.upgrade-box select{width:100%;max-width:230px;background:#111a1b;color:white;border:1px solid #ffffff25;border-radius:9px;padding:10px}
+.upgrade-wheel-wrap{position:relative;display:grid;place-items:center;padding:14px}
+.upgrade-pointer{position:absolute;top:0;z-index:2;width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:29px solid #dcecff;filter:drop-shadow(0 2px 4px #000)}
+.upgrade-wheel{width:min(100%,270px);aspect-ratio:1;border-radius:50%;background:conic-gradient(#39d98a 0 50%,#26332f 50% 100%);border:7px solid #42658e;box-shadow:0 0 0 5px #080e18,0 0 25px #317bbd88;display:grid;place-items:center;transition:transform 3.2s cubic-bezier(.12,.72,.1,1)}
+.upgrade-wheel-inner{width:68%;height:68%;border-radius:50%;background:radial-gradient(#192741,#0b1220);border:2px solid #54759b;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:28px}
+.upgrade-wheel-inner span{font-size:12px;letter-spacing:2px;color:#9baec6}
+@media(max-width:650px){.upgrader-layout{grid-template-columns:1fr}.upgrade-wheel-wrap{order:2}.upgrade-box:last-child{order:3}}
+.reel{height:126px;overflow:hidden;position:relative;border-radius:14px;border:2px solid var(--accent);background:#0d1120}
+.reel:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:3px;background:#fff;box-shadow:0 0 12px var(--accent)}
+.reel-track{display:flex;gap:9px;height:100%;align-items:center;will-change:transform;transform:translateX(0)}
+.reel-card{flex:0 0 108px;height:96px;border-radius:12px;background:linear-gradient(145deg,#18352e,#101a19);border:1px solid #4a9d7b55;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5px;font-size:12px}
+.reel-card .emoji{font-size:30px;margin:0 0 5px}
+.reel-card.winner{background:#51417d;border-color:#d8c9ff;box-shadow:0 0 18px #9b7bff}
+@keyframes winpop{0%{transform:scale(.8)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+.winner-pop{animation:winpop .45s ease}
+@media(max-width:600px){.wheel{grid-template-columns:repeat(5,1fr)}.slot{font-size:15px;padding:13px 2px}}
+
+.menu-wrap{position:relative}
+.menu-toggle{width:42px;height:42px;padding:8px;background:#123d32;border:1px solid #43b99366;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;box-shadow:0 0 16px #20c99722}
+.menu-toggle span{display:block;width:21px;height:2px;border-radius:3px;background:#b9ffe2}
+.menu-dropdown{position:absolute;right:0;top:50px;z-index:20;min-width:205px;padding:8px;background:#081512f5;border:1px solid #3ca98a66;border-radius:13px;box-shadow:0 14px 35px #000b;display:none}
+.menu-dropdown.open{display:grid;gap:5px}
+.menu-dropdown button{width:100%;text-align:left;background:#122b24;color:#eafff5;padding:10px 12px;box-shadow:none}
+.menu-dropdown button:hover{background:#1d5745}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>🧠 <span>Brainrot</span>Green</h1>
+  <div class="row"><div class="balance">Баланс: <b id="balance">1000</b> 🪙</div><button onclick="showTab('admin')">Админка</button></div>
+</header>
+<main>
+  <div class="menu-wrap">
+    <button class="menu-toggle" id="menuToggle" aria-label="Открыть меню" aria-expanded="false" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    <div class="menu-dropdown" id="menuDropdown">
+      <button onclick="menuGo('cases')">📦 Кейсы</button>
+      <button onclick="menuGo('profile')">👤 Профиль</button>
+      <button onclick="menuGo('wheel')">🎡 Колесо удачи</button>
+      <button onclick="menuGo('inventory')">🎒 Мои брейнроты</button>
+      <button onclick="menuGo('upgrader')">⚡ Апгрейдер</button>
+      <button onclick="menuGo('withdraw')">📤 Вывод</button>
+      <button onclick="menuGo('promo')">🎟️ Промокод</button>
+      <button onclick="menuGo('admin')">🔐 Админка</button>
+    </div>
+  </div>
+
+  <section id="profile" class="tab panel hidden">
+    <h2>👤 Профиль</h2>
+    <div class="item" style="max-width:420px;text-align:left">
+      <div class="muted">ТВОЙ БАЛАНС</div>
+      <div id="profileBalance" style="font-size:32px;font-weight:900;color:var(--green);margin-top:8px">1000 🪙</div>
+      <p class="notice">Баланс виртуальных монет в демо-игре.</p>
+    </div>
+  </section>
+
+  <section id="cases" class="tab panel">
+    <h2>Открывай кейсы</h2><p class="notice">Все монеты и предметы здесь виртуальные. Это демо без ставок на реальные деньги, покупок и вывода призов.</p>
+    <div id="caseList" class="grid"></div>
+    <div id="caseRoller" class="panel hidden" style="margin-top:18px;background:#121625">
+      <h3 style="text-align:center">🎰 Открытие кейса</h3>
+      <div id="reel" class="reel"><div class="reel-track" id="reelTrack"></div></div>
+      <div class="small" style="text-align:center;margin-top:8px">Предмет остановится по центру</div>
+    </div>
+    <div id="caseResult" class="result"></div>
+  </section>
+
+  <section id="wheel" class="tab panel hidden">
+    <h2>🎡 Колесо удачи</h2>
+    <p class="notice">Используются только бесплатные виртуальные монеты. Иногда выпадает ×0 — ставка не возвращается.</p>
+    <div class="wheel" id="wheelSlots">
+      <div class="slot">×0</div><div class="slot">×2</div><div class="slot">×3</div><div class="slot">×5</div><div class="slot">×10</div>
+    </div>
+    <div class="row"><input id="bet" type="number" min="1" step="1" value="50" placeholder="Виртуальная ставка"><button onclick="spin()">Крутить</button></div>
+    <div id="wheelResult" class="result"></div>
+  </section>
+
+  <section id="inventory" class="tab panel hidden">
+    <h2>🎒 Мои брейнроты</h2><div id="inventoryList" class="grid"></div>
+  </section>
+
+  <section id="upgrader" class="tab panel hidden">
+    <h2>⚡ Апгрейдер</h2>
+    <p class="notice">Выбери брейнрота из инвентаря и цель. При успехе исходный предмет заменится на выбранный, при неудаче исходный предмет сгорит. Это только игровая симуляция на виртуальных предметах.</p>
+    <div class="upgrader-layout">
+      <div class="upgrade-box"><div class="muted">ТВОЙ БРЕЙНРОТ</div><div class="emoji">📥</div><select id="upgradeSource"><option value="">Выбрать из инвентаря</option></select></div>
+      <div class="upgrade-wheel-wrap"><div class="upgrade-pointer"></div><div id="upgradeWheel" class="upgrade-wheel"><div class="upgrade-wheel-inner"><b id="upgradeChanceLabel">50%</b><span>ШАНС</span></div></div></div>
+      <div class="upgrade-box"><div class="muted">ЦЕЛЬ</div><div class="emoji">🎯</div><select id="upgradeTarget"><option value="">Выбрать цель</option></select></div>
+    </div>
+    <div class="upgrade-controls" style="max-width:650px;margin:18px auto;padding:14px;background:#101a18;border:1px solid #34765d;border-radius:14px">
+      <div class="row" style="justify-content:center;gap:12px;align-items:center">
+        <label for="upgradeChance" style="margin:0">Шанс успеха:</label>
+        <input id="upgradeChance" type="number" min="0.01" max="100" step="0.01" value="50" oninput="updateUpgradeChance()" style="width:110px;background:#111522;color:white;border:1px solid #34765d;border-radius:10px;padding:10px">
+        <b>%</b>
+        <button id="upgradeButton" onclick="runUpgrade()">ПРОКАЧАТЬ</button>
+      </div>
+      <input id="upgradeChanceRange" type="range" min="0.01" max="100" step="0.01" value="50" oninput="syncUpgradeChance(this.value)" style="width:100%;margin-top:14px;accent-color:#39d98a">
+      <div class="row" style="justify-content:space-between;margin-top:6px"><span class="small">0,01% — очень редко</span><span class="small">100% — всегда</span></div>
+      <div id="upgradeOddsHint" class="small" style="text-align:center;margin-top:8px">Примерно 1 успех на 2 попытки</div>
+    </div>
+    <div id="upgradeResult" class="result" style="text-align:center"></div>
+  </section>
+
+  <section id="withdraw" class="tab panel hidden">
+    <h2>📤 Заявка на вывод брейнрота</h2>
+    <p class="notice">Укажи Roblox username и выбери предмет из инвентаря. Это демонстрационная заявка: сайт не подключён к Roblox и не передаёт предметы автоматически. Никогда не вводи пароль Roblox, cookie или коды подтверждения.</p>
+    <label for="robloxUser">Ник Roblox (username)</label>
+    <div class="row"><input id="robloxUser" maxlength="20" placeholder="Например, Player123"><select id="withdrawItem" style="flex:1;background:#111522;color:white;border:1px solid #ffffff20;border-radius:11px;padding:11px;min-width:180px"><option value="">Выбери брейнрота</option></select><button onclick="requestWithdraw()">Создать заявку</button></div>
+    <div id="withdrawResult" class="result"></div>
+    <div class="admin-section"><h3>Мои заявки</h3><div id="withdrawList" class="grid"></div></div>
+  </section>
+  <section id="promo" class="tab panel hidden">
+    <h2>🎟️ Активировать промокод</h2>
+    <div class="row"><input id="promoInput" placeholder="Введи промокод"><button onclick="redeemPromo()">Активировать</button></div>
+    <p class="notice">Один промокод можно использовать один раз на этом устройстве.</p>
+  </section>
+
+  <section id="admin" class="tab panel hidden">
+    <h2>🔐 Панель администратора</h2>
+    <div id="adminLogin" class="row"><input id="adminPassword" type="password" placeholder="Пароль админа"><button onclick="loginAdmin()">Войти</button></div>
+    <div id="adminTools" class="hidden">
+      <p class="notice">Демо-админка хранит данные в браузере. Не используй её как защиту для публичного сайта: пароль и логика в HTML видны пользователям.</p>
+      <div class="admin-section">
+        <h3>Создать промокод</h3>
+        <div class="row"><input id="newPromo" placeholder="Например, BRAIN100"><input id="promoAmount" type="number" min="1" value="100" placeholder="Монеты"><button onclick="createPromo()">Создать</button></div>
+        <div id="promoAdminList" class="small"></div>
+      </div>
+      <div class="admin-section">
+        <h3>Добавить кейс</h3>
+        <div class="row"><input id="caseName" placeholder="Название кейса"><input id="caseEmoji" placeholder="Эмодзи" value="📦" style="max-width:90px"><input id="casePrice" type="number" min="1" value="100" placeholder="Цена"><button onclick="addCase()">Добавить</button></div>
+        <p class="small">В новый кейс автоматически добавляется несколько демо-предметов. Удалить кейс можно в списке ниже.</p>
+      </div>
+      <div class="admin-section">
+        <h3>🧠 Управление брейнротами</h3>
+        <div class="row">
+          <input id="brainrotName" placeholder="Название брейнрота">
+          <input id="brainrotEmoji" placeholder="Эмодзи" value="🧠" style="max-width:90px">
+          <input id="brainrotPrice" type="number" min="0" value="100" placeholder="Цена">
+          <select id="brainrotCase" style="background:#111522;color:white;border-radius:10px;padding:10px;min-width:150px"><option value="">Добавить в кейс…</option></select>
+          <button onclick="addBrainrot()">Добавить</button>
+        </div>
+        <p class="small">Удаление убирает брейнрота из всех кейсов и инвентарей. Цена отображается в инвентаре и списке админки.</p>
+        <div id="adminBrainrotList"></div>
+      </div>
+      <div class="admin-section"><h3>Управление кейсами</h3><div id="adminCaseList"></div></div>
+      <div class="admin-section"><button onclick="logoutAdmin()" style="background:#4a526b">Выйти из админки</button><button onclick="resetDemo()" style="background:#a63e58">Сбросить демо</button></div>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
+<script>
+const ADMIN_PASSWORD = "admin123"; // Для локального демо. Перед публикацией нужна серверная авторизация.
+const defaultCases = [
+ {id:1,name:"Начальный",emoji:"📦",price:100,items:[["Tung Tung Sahur","🥁",55],["Tralalero Tralala","🦈",30],["Bombardiro Crocodilo","🐊",15]]},
+ {id:2,name:"Мемный",emoji:"🎁",price:250,items:[["Ballerina Cappuccina","☕",50],["Chimpanzini Bananini","🐒",35],["Bombombini Gusini","🪿",15]]},
+ {id:3,name:"Легендарный",emoji:"💎",price:500,items:[["Cappuccino Assassino","🥷",55],["La Vaca Saturno Saturnita","🐄",35],["Secret Brainrot","👑",10]]}
+];
+const fresh=()=>({balance:1000,cases:defaultCases,inventory:[],promos:{WELCOME100:100},usedPromos:[]});
+let state;
+try{state=JSON.parse(localStorage.getItem("brainrot_demo_state"))||fresh()}catch{state=fresh()}
+if(!Array.isArray(state.withdrawals))state.withdrawals=[];
+if(!state.brainrotPrices)state.brainrotPrices={};
+function brainrotPrice(name){return Number(state.brainrotPrices[name]??100)}
+function save(){localStorage.setItem("brainrot_demo_state",JSON.stringify(state));render()}
+function toast(s){let t=document.getElementById("toast");t.textContent=s;t.style.display="block";setTimeout(()=>t.style.display="none",2400)}
+function toggleMenu(){
+  const menu=document.getElementById("menuDropdown");
+  const button=document.getElementById("menuToggle");
+  const open=!menu.classList.contains("open");
+  menu.classList.toggle("open",open);
+  button.setAttribute("aria-expanded",String(open));
+}
+function menuGo(id){
+  showTab(id);
+  document.getElementById("menuDropdown").classList.remove("open");
+  document.getElementById("menuToggle").setAttribute("aria-expanded","false");
+}
+function showTab(id){document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");if(id==="admin"&&!sessionStorage.getItem("brainrot_admin")){document.getElementById("adminLogin").classList.remove("hidden");document.getElementById("adminTools").classList.add("hidden")}}
+function weighted(items){let r=Math.random()*items.reduce((s,x)=>s+x[2],0);for(const x of items){r-=x[2];if(r<=0)return x}return items[items.length-1]}
+let rolling=false;
+async function openCase(id){
+ let c=state.cases.find(x=>x.id===id);if(!c||rolling)return;
+ if(state.balance<c.price){toast("Не хватает виртуальных монет");return}
+ rolling=true;state.balance-=c.price;save();
+ const box=document.getElementById("caseRoller"),track=document.getElementById("reelTrack"),result=document.getElementById("caseResult");
+ box.classList.remove("hidden");result.textContent="Кейс открывается...";
+ const prize=weighted(c.items);
+ // Формируем ленту из случайных предметов, а точный приз ставим в позицию остановки.
+ const total=32;
+ const winnerIndex=total-4;
+ const sequence=Array.from({length:total},()=>weighted(c.items));
+ sequence[winnerIndex]=prize;
+ track.innerHTML=sequence.map((x,i)=>`<div class="reel-card ${i===winnerIndex?'winner':''}"><div class="emoji">${esc(x[1])}</div><b>${esc(x[0])}</b></div>`).join("");
+ track.style.transition="none";track.style.transform="translateX(0)";
+ await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+ const card=track.children[winnerIndex], reel=document.getElementById("reel");
+ const target=card.offsetLeft+card.offsetWidth/2-reel.clientWidth/2;
+ track.style.transition="transform 4.2s cubic-bezier(.08,.72,.12,1)";
+ track.style.transform=`translateX(-${Math.max(0,target)}px)`;
+ await new Promise(r=>setTimeout(r,4350));
+ state.inventory.unshift({name:prize[0],emoji:prize[1],caseName:c.name});
+ result.innerHTML=`Выпало: <b>${esc(prize[1])} ${esc(prize[0])}</b>!`;
+ result.classList.remove("winner-pop");void result.offsetWidth;result.classList.add("winner-pop");
+ save();rolling=false;
+}
+
+function spin(){let bet=Math.floor(Number(document.getElementById("bet").value));if(!Number.isFinite(bet)||bet<1){toast("Укажи ставку от 1 виртуальной монеты");return}if(bet>state.balance){toast("Не хватает виртуальных монет");return}
+ state.balance-=bet;const outcomes=[["×0",0,42],["×2",2,30],["×3",3,16],["×5",5,9],["×10",10,3]];let win=weighted(outcomes);let slots=[...document.querySelectorAll(".slot")];slots.forEach(x=>x.classList.remove("active"));let idx=outcomes.indexOf(win);slots[idx].classList.add("active");let payout=bet*win[1];state.balance+=payout;document.getElementById("wheelResult").textContent=win[1]===0?`Выпало ${win[0]}. В этот раз без выигрыша.`:`Выпало ${win[0]}! Начислено ${payout} виртуальных монет.`;save()}
+function redeemPromo(){let code=document.getElementById("promoInput").value.trim().toUpperCase();let amount=state.promos[code];if(!amount){toast("Промокод не найден");return}if(state.usedPromos.includes(code)){toast("Этот промокод уже использован");return}state.balance+=amount;state.usedPromos.push(code);document.getElementById("promoInput").value="";save();toast(`Начислено ${amount} виртуальных монет!`)}
+function loginAdmin(){if(document.getElementById("adminPassword").value===ADMIN_PASSWORD){sessionStorage.setItem("brainrot_admin","1");document.getElementById("adminLogin").classList.add("hidden");document.getElementById("adminTools").classList.remove("hidden");render()}else toast("Неверный пароль")}
+function logoutAdmin(){sessionStorage.removeItem("brainrot_admin");document.getElementById("adminTools").classList.add("hidden");document.getElementById("adminLogin").classList.remove("hidden")}
+function isAdmin(){return sessionStorage.getItem("brainrot_admin")==="1"}
+function createPromo(){if(!isAdmin())return;let code=document.getElementById("newPromo").value.trim().toUpperCase(),amount=Math.floor(+document.getElementById("promoAmount").value);if(!code||!Number.isFinite(amount)||amount<1)return toast("Проверь код и сумму");if(state.promos[code])return toast("Такой код уже существует");state.promos[code]=amount;document.getElementById("newPromo").value="";save();toast("Промокод создан")}
+function addCase(){if(!isAdmin())return;let name=document.getElementById("caseName").value.trim(),emoji=document.getElementById("caseEmoji").value.trim()||"📦",price=Math.floor(+document.getElementById("casePrice").value);if(!name||!Number.isFinite(price)||price<1)return toast("Проверь название и цену");state.cases.push({id:Date.now(),name,emoji,price,items:[[name+" обычный","🧠",60],[name+" редкий","✨",30],[name+" секретный","👑",10]]});document.getElementById("caseName").value="";save();toast("Кейс добавлен")}
+function allBrainrots(){
+ const map=new Map();
+ state.cases.forEach(c=>c.items.forEach(x=>{if(!map.has(x[0]))map.set(x[0],{name:x[0],emoji:x[1]})}));
+ state.inventory.forEach(x=>{if(!map.has(x.name))map.set(x.name,{name:x.name,emoji:x.emoji})});
+ return [...map.values()];
+}
+function addBrainrot(){
+ if(!isAdmin())return;
+ const name=document.getElementById("brainrotName").value.trim();
+ const emoji=document.getElementById("brainrotEmoji").value.trim()||"🧠";
+ const price=Math.floor(Number(document.getElementById("brainrotPrice").value));
+ const caseId=Number(document.getElementById("brainrotCase").value);
+ const target=state.cases.find(c=>c.id===caseId);
+ if(!name||!Number.isFinite(price)||price<0||!target)return toast("Укажи название, цену и кейс");
+ if(allBrainrots().some(x=>x.name.toLowerCase()===name.toLowerCase()))return toast("Такой брейнрот уже существует");
+ target.items.push([name,emoji,10]);
+ state.brainrotPrices[name]=price;
+ document.getElementById("brainrotName").value="";
+ save();toast("Брейнрот добавлен в кейс");
+}
+function renameBrainrot(oldName,newName){
+ if(!isAdmin())return;
+ newName=String(newName||"").trim();
+ if(!newName)return toast("Название не может быть пустым");
+ if(newName!==oldName&&allBrainrots().some(x=>x.name.toLowerCase()===newName.toLowerCase()))return toast("Такое название уже используется");
+ state.cases.forEach(c=>c.items.forEach(x=>{if(x[0]===oldName)x[0]=newName}));
+ state.inventory.forEach(x=>{if(x.name===oldName)x.name=newName});
+ state.withdrawals.forEach(w=>{if(w.item&&w.item.name===oldName)w.item.name=newName});
+ if(Object.prototype.hasOwnProperty.call(state.brainrotPrices,oldName)){
+   state.brainrotPrices[newName]=state.brainrotPrices[oldName];
+   if(newName!==oldName)delete state.brainrotPrices[oldName];
+ }
+ save();toast("Название брейнрота изменено");
+}
+function removeCaseDrop(caseId,name){
+ if(!isAdmin())return;
+ const c=state.cases.find(x=>x.id===caseId);
+ if(!c)return;
+ if(!confirm("Убрать «"+name+"» из кейса «"+c.name+"»?"))return;
+ c.items=c.items.filter(x=>x[0]!==name);
+ save();toast("Дроп удалён из кейса");
+}
+function deleteBrainrot(name){
+ if(!isAdmin())return;
+ if(!confirm("Удалить "+name+" из всех кейсов и инвентарей?"))return;
+ state.cases.forEach(c=>c.items=c.items.filter(x=>x[0]!==name));
+ state.inventory=state.inventory.filter(x=>x.name!==name);
+ state.withdrawals=state.withdrawals.filter(w=>w.item.name!==name);
+ delete state.brainrotPrices[name];
+ save();toast("Брейнрот удалён");
+}
+function changeBrainrotPrice(name,value){
+ if(!isAdmin())return;
+ const price=Math.floor(Number(value));
+ if(!Number.isFinite(price)||price<0)return toast("Цена должна быть 0 или больше");
+ state.brainrotPrices[name]=price;save();toast("Цена обновлена");
+}
+function removeCase(id){if(!isAdmin())return;state.cases=state.cases.filter(c=>c.id!==id);save()}
+function resetDemo(){if(!isAdmin())return;if(confirm("Сбросить баланс, кейсы, промокоды и инвентарь?")){state=fresh();save();toast("Демо сброшено")}}
+function requestWithdraw(){
+ const username=document.getElementById("robloxUser").value.trim();
+ const index=Number(document.getElementById("withdrawItem").value);
+ if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){toast("Проверь Roblox username: 3–20 символов, латиница, цифры или _");return}
+ if(!Number.isInteger(index)||!state.inventory[index]){toast("Сначала выбери брейнрота из инвентаря");return}
+ const item=state.inventory.splice(index,1)[0];
+ state.withdrawals.unshift({username,item,status:"Демо-заявка создана",date:new Date().toLocaleString("ru-RU")});
+ document.getElementById("withdrawResult").textContent="Заявка сохранена в браузере. Реальной передачи предмета не произошло.";
+ save();toast("Демо-заявка создана");
+}
+let upgradeBusy=false;
+function formatChance(value){
+ const n=Number(value);
+ return n.toLocaleString("ru-RU",{maximumFractionDigits:2})+"%";
+}
+function updateUpgradeChance(){
+ const input=document.getElementById("upgradeChance");
+ let chance=Number(input.value);
+ if(!Number.isFinite(chance))chance=0.01;
+ chance=Math.min(100,Math.max(0.01,chance));
+ document.getElementById("upgradeChanceLabel").textContent=formatChance(chance);
+ document.getElementById("upgradeChanceRange").value=chance;
+ const wheel=document.getElementById("upgradeWheel");
+ const greenEnd=chance.toFixed(2);
+ wheel.style.background=`conic-gradient(#39d98a 0 ${greenEnd}%,#26332f ${greenEnd}% 100%)`;
+ const odds=document.getElementById("upgradeOddsHint");
+ odds.textContent=chance>=100?"Успех гарантирован":`Примерно 1 успех на ${Math.max(1,Math.round(100/chance)).toLocaleString("ru-RU")} попыток`;
+
+}
+function syncUpgradeChance(value){
+ document.getElementById("upgradeChance").value=value;
+ updateUpgradeChance();
+}
+function runUpgrade(){
+ if(upgradeBusy)return;
+ const sourceValue=document.getElementById("upgradeSource").value;
+ const sourceIndex=Number(sourceValue);
+ const targetRaw=document.getElementById("upgradeTarget").value;
+ if(sourceValue===""||!Number.isInteger(sourceIndex)||!state.inventory[sourceIndex])return toast("Выбери свой брейнрот");
+ if(!targetRaw)return toast("Выбери цель для апгрейда");
+ const [targetName,targetEmoji]=JSON.parse(targetRaw);
+ const source=state.inventory[sourceIndex];
+ if(source.name===targetName)return toast("Выбери другой предмет");
+ const chance=Number(document.getElementById("upgradeChance").value);
+ if(!Number.isFinite(chance)||chance<0.01||chance>100)return toast("Укажи шанс от 0,01% до 100%");
+ const won=Math.random()*100<chance;
+ upgradeBusy=true;document.getElementById("upgradeButton").disabled=true;
+ document.getElementById("upgradeResult").textContent="Колесо крутится...";
+ const wheel=document.getElementById("upgradeWheel");
+ const turns=5+Math.floor(Math.random()*4);
+ // Колесо останавливается честно по выпавшему результату:
+ // указатель попадает в зелёный сектор при успехе и в тёмный при неудаче.
+ const greenDegrees=chance*3.6;
+ const pointerPosition=won
+   ? Math.random()*greenDegrees
+   : greenDegrees+Math.random()*(360-greenDegrees);
+ const angle=turns*360+((360-pointerPosition)%360);
+ wheel.style.transform=`rotate(${angle}deg)`;
+ setTimeout(()=>{
+   state.inventory.splice(sourceIndex,1);
+   if(won){state.inventory.unshift({name:targetName,emoji:targetEmoji,caseName:"Апгрейд"});document.getElementById("upgradeResult").textContent=`🎉 УСПЕХ! Получен ${targetEmoji} ${targetName}!`}
+   else{document.getElementById("upgradeResult").textContent=`💥 Неудача! ${source.emoji} ${source.name} потерян.`}
+   upgradeBusy=false;document.getElementById("upgradeButton").disabled=false;save();
+ },3300);
+}
+function render(){updateUpgradeChance();document.getElementById("balance").textContent=state.balance;document.getElementById("profileBalance").textContent=state.balance+" 🪙";document.getElementById("caseList").innerHTML=state.cases.map(c=>`<div class="case"><div class="emoji">${esc(c.emoji)}</div><h3>${esc(c.name)}</h3><div class="price">${c.price} 🪙</div><button onclick="openCase(${c.id})">Открыть кейс</button></div>`).join("")||"<p>Кейсов пока нет.</p>";
+document.getElementById("inventoryList").innerHTML=state.inventory.map(x=>`<div class="item"><div class="emoji">${esc(x.emoji)}</div><b>${esc(x.name)}</b><div class="small">Из кейса: ${esc(x.caseName)}</div><div class="price">${brainrotPrice(x.name)} 🪙</div></div>`).join("")||"<p class='muted'>Пока пусто — открой первый кейс!</p>";
+ const sourceSelect=document.getElementById("upgradeSource"),oldSource=sourceSelect.value;
+ sourceSelect.innerHTML='<option value="">Выбрать из инвентаря</option>'+state.inventory.map((x,i)=>`<option value="${i}">${esc(x.emoji)} ${esc(x.name)}</option>`).join("");
+ if(oldSource!==""&&state.inventory[Number(oldSource)])sourceSelect.value=oldSource;
+ const targets=[...new Map(state.cases.flatMap(c=>c.items.map(x=>[x[0],x])).map(x=>[x[0],x])).values()];
+ const targetSelect=document.getElementById("upgradeTarget"),oldTarget=targetSelect.value;
+ targetSelect.innerHTML='<option value="">Выбрать цель</option>'+targets.map(x=>`<option value="${esc(JSON.stringify([x[0],x[1]]))}">${esc(x[1])} ${esc(x[0])}</option>`).join("");
+ if(oldTarget)targetSelect.value=oldTarget;
+
+document.getElementById("promoAdminList").textContent=Object.entries(state.promos).map(([k,v])=>`${k} — ${v} монет`).join(" • ")||"Промокодов нет";
+const casePicker=document.getElementById("brainrotCase"),oldCase=casePicker.value;
+ casePicker.innerHTML='<option value="">Добавить в кейс…</option>'+state.cases.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");
+ if(oldCase&&state.cases.some(c=>String(c.id)===oldCase))casePicker.value=oldCase;
+ document.getElementById("adminBrainrotList").innerHTML=allBrainrots().map(x=>`<div class="row" style="margin:10px 0;padding:10px;background:#111a1b;border-radius:10px"><span style="flex:1;min-width:120px">${esc(x.emoji)} <b>${esc(x.name)}</b></span><input aria-label="Новое название" id="rename-${encodeURIComponent(x.name)}" value="${esc(x.name)}" style="max-width:180px;padding:7px"><button onclick="renameBrainrot(decodeURIComponent('${encodeURIComponent(x.name)}'),document.getElementById('rename-${encodeURIComponent(x.name)}').value)">Переименовать</button><label style="margin:0">Цена <input type="number" min="0" value="${brainrotPrice(x.name)}" style="width:100px;padding:7px" onchange="changeBrainrotPrice(decodeURIComponent('${encodeURIComponent(x.name)}'),this.value)"></label><button style="background:#a63e58" onclick="deleteBrainrot(decodeURIComponent('${encodeURIComponent(x.name)}'))">Удалить</button></div>`).join("")||'<p class="muted">Брейнротов пока нет.</p>';
+ document.getElementById("adminCaseList").innerHTML=state.cases.map(c=>`<div style="margin:12px 0;padding:12px;background:#111a1b;border:1px solid #ffffff18;border-radius:10px"><div class="row"><span style="flex:1"><b>${esc(c.emoji)} ${esc(c.name)}</b> — ${c.price} 🪙</span><button style="background:#a63e58" onclick="removeCase(${c.id})">Удалить кейс</button></div><div class="small" style="margin-top:8px">Дропы этого кейса:</div>${c.items.map((x,j)=>`<div class="row" style="margin:6px 0;padding:7px;background:#192321;border-radius:8px"><span style="flex:1">${esc(x[1])} ${esc(x[0])} <span class="small">· шанс ${esc(x[2])}%</span></span><button style="background:#a63e58" onclick="removeCaseDrop(${c.id},decodeURIComponent('${encodeURIComponent(x[0])}'))">Убрать дроп</button></div>`).join("")||'<div class="small">В кейсе пока нет дропов.</div>'}</div>`).join("")||"Кейсов нет";
+ const select=document.getElementById("withdrawItem"),prev=select.value;
+ select.innerHTML='<option value="">Выбери брейнрота</option>'+state.inventory.map((x,i)=>`<option value="${i}">${esc(x.emoji)} ${esc(x.name)}</option>`).join("");
+ if(prev!==""&&state.inventory[Number(prev)])select.value=prev;
+ document.getElementById("withdrawList").innerHTML=state.withdrawals.map(w=>`<div class="item"><b>${esc(w.item.emoji)} ${esc(w.item.name)}</b><div class="small">Roblox: ${esc(w.username)}</div><div class="small">${esc(w.status)} · ${esc(w.date)}</div></div>`).join("")||'<p class="muted">Заявок пока нет.</p>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+render();
+</script>
+</body></html>
